@@ -1,4 +1,5 @@
 import { Star, Calendar, Play } from 'lucide-react'
+import DownloadMenu from './DownloadMenu'
 
 interface MovieCardProps {
     id: number
@@ -7,6 +8,8 @@ interface MovieCardProps {
     voteAverage: number
     releaseDate: string
     mediaType: string
+    overview?: string
+    originalLanguage?: string
     onPlay: (id: number, type: string, title: string) => void
 }
 
@@ -19,6 +22,8 @@ export function MovieCard({
     voteAverage,
     releaseDate,
     mediaType,
+    overview,
+    originalLanguage,
     onPlay
 }: MovieCardProps) {
     return (
@@ -66,20 +71,38 @@ export function MovieCard({
                 <h4 className="font-semibold text-white truncate text-lg group-hover:text-netflix-red transition-colors duration-200">
                     {title}
                 </h4>
-                <div className="flex items-center space-x-3 text-sm text-netflix-light-gray mt-2">
-                    <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                        <span className="font-medium">{voteAverage.toFixed(1)}</span>
-                    </div>
-                    {releaseDate && (
+                <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center space-x-3 text-sm text-netflix-light-gray">
                         <div className="flex items-center space-x-1">
-                            <Calendar className="w-4 h-4" />
-                            <span>{new Date(releaseDate).getFullYear()}</span>
+                            <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                            <span className="font-medium">{voteAverage.toFixed(1)}</span>
                         </div>
-                    )}
-                    <span className="capitalize bg-netflix-gray px-2 py-0.5 rounded-full text-xs">
-                        {mediaType === 'movie' ? 'Movie' : 'TV Show'}
-                    </span>
+                        {releaseDate && (
+                            <div className="flex items-center space-x-1">
+                                <Calendar className="w-4 h-4" />
+                                <span>{new Date(releaseDate).getFullYear()}</span>
+                            </div>
+                        )}
+                        <span className="capitalize bg-netflix-gray px-2 py-0.5 rounded-full text-xs">
+                            {mediaType === 'movie' ? 'Movie' : 'TV Show'}
+                        </span>
+                    </div>
+                </div>
+                
+                {/* Download Menu */}
+                <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <DownloadMenu 
+                        content={{
+                            id,
+                            title,
+                            poster_path: posterPath || '',
+                            overview: overview || 'No overview available',
+                            vote_average: voteAverage,
+                            type: mediaType === 'movie' ? 'movie' : 'tv',
+                            release_date: releaseDate,
+                            original_language: originalLanguage
+                        }}
+                    />
                 </div>
             </div>
         </div>
