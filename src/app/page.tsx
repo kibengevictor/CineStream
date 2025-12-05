@@ -81,7 +81,8 @@ export default function HomePage() {
                     backdrop_path: "/fNG7i7RqMErkcqhohV2a6cV1Ehy.jpg",
                     overview: "A computer programmer discovers reality is a simulation.",
                     release_date: "1999-03-31",
-                    vote_average: 8.2
+                    vote_average: 8.2,
+                    original_language: "en"
                 }
             ])
         } finally {
