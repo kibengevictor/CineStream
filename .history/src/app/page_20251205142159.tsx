@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X } from 'lucide-react'
+import { X, Bookmark } from 'lucide-react'
+import { MovieCard } from '@/components/MovieCard'
 
 // Types
 interface Movie {
@@ -143,21 +144,21 @@ export default function HomePage() {
     return (
         <div className="min-h-screen bg-netflix-black text-white">
             {/* Header */}
-            <header className="bg-netflix-black bg-opacity-90 backdrop-blur-sm sticky top-0 z-50">
+            <header className="bg-netflix-black bg-opacity-90 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-800">
                 <div className="max-w-7xl mx-auto px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-3xl font-bold text-netflix-red">
-                            Cine
+                    <div className="flex items-center justify-between gap-4">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-netflix-red whitespace-nowrap">
+                            CineStream
                         </h1>
 
-                        <div className="flex items-center space-x-3 bg-netflix-gray rounded-xl px-6 py-3 max-w-2xl w-full mx-8">
+                        <div className="flex items-center space-x-3 bg-netflix-gray rounded-xl px-4 sm:px-6 py-3 max-w-2xl flex-1">
                             <input
                                 type="text"
                                 placeholder="Search for movies, TV shows..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                                className="bg-transparent flex-1 outline-none text-white placeholder-netflix-light-gray text-lg"
+                                className="bg-transparent flex-1 outline-none text-white placeholder-netflix-light-gray text-sm sm:text-lg"
                             />
                             {searchTerm && (
                                 <button
@@ -170,11 +171,20 @@ export default function HomePage() {
                             <button
                                 onClick={handleSearch}
                                 disabled={searchLoading || !searchTerm.trim()}
-                                className="bg-netflix-red hover:bg-red-600 disabled:bg-netflix-gray disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-medium transition-all duration-200"
+                                className="bg-netflix-red hover:bg-red-600 disabled:bg-netflix-gray disabled:cursor-not-allowed text-white px-4 sm:px-6 py-2 rounded-lg font-medium transition-all duration-200 text-sm sm:text-base"
                             >
                                 {searchLoading ? 'Searching...' : 'Search'}
                             </button>
                         </div>
+
+                        <button
+                            onClick={() => router.push('/watchlist')}
+                            className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+                            title="My Watchlist"
+                        >
+                            <Bookmark size={20} />
+                            <span className="hidden sm:inline">Watchlist</span>
+                        </button>
                     </div>
                 </div>
             </header>
@@ -251,50 +261,18 @@ export default function HomePage() {
                                     if (mediaType === 'person') return null
 
                                     return (
-                                        <div key={`${item.id}-${mediaType}`} className="group cursor-pointer transform transition-all duration-300 hover:scale-105">
-                                            <div className="relative aspect-[2/3] bg-netflix-gray rounded-xl overflow-hidden shadow-lg">
-                                                {item.poster_path ? (
-                                                    <img
-                                                        src={`${IMAGE_BASE_URL}${item.poster_path}`}
-                                                        alt={title}
-                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                                        onError={(e) => {
-                                                            e.currentTarget.src = `https://via.placeholder.com/300x450/2F2F2F/808080?text=${encodeURIComponent(title)}`
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gradient-to-br from-netflix-gray to-netflix-dark-gray flex items-center justify-center text-netflix-light-gray">
-                                                        <span className="text-center p-4 font-medium">{title}</span>
-                                                    </div>
-                                                )}
-
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                                    <button
-                                                        onClick={() => playContent(item.id, mediaType, title)}
-                                                        className="bg-netflix-red text-white p-4 rounded-full hover:bg-red-600 transition-all duration-200 shadow-lg"
-                                                    >
-                                                        ▶
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-4">
-                                                <h4 className="font-semibold text-white truncate text-lg group-hover:text-netflix-red transition-colors duration-200">
-                                                    {title}
-                                                </h4>
-                                                <div className="flex items-center space-x-2 text-sm text-netflix-light-gray mt-2">
-                                                    <span>⭐ {item.vote_average.toFixed(1)}</span>
-                                                    {releaseDate && (
-                                                        <>
-                                                            <span>•</span>
-                                                            <span>{new Date(releaseDate).getFullYear()}</span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <MovieCard
+                                            key={`${item.id}-${mediaType}`}
+                                            id={item.id}
+                                            title={title}
+                                            posterPath={item.poster_path}
+                                            voteAverage={item.vote_average}
+                                            releaseDate={releaseDate}
+                                            mediaType={mediaType}
+                                            overview={item.overview}
+                                            originalLanguage={item.original_language}
+                                            onPlay={playContent}
+                                        />
                                     )
                                 })}
                             </div>
@@ -326,46 +304,18 @@ export default function HomePage() {
                         ) : (
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
                                 {movies.map((movie) => (
-                                    <div key={movie.id} className="group cursor-pointer transform transition-all duration-300 hover:scale-105">
-                                        <div className="relative aspect-[2/3] bg-netflix-gray rounded-xl overflow-hidden shadow-lg">
-                                            {movie.poster_path ? (
-                                                <img
-                                                    src={`${IMAGE_BASE_URL}${movie.poster_path}`}
-                                                    alt={movie.title}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                                    onError={(e) => {
-                                                        e.currentTarget.src = `https://via.placeholder.com/300x450/2F2F2F/808080?text=${encodeURIComponent(movie.title)}`
-                                                    }}
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full bg-gradient-to-br from-netflix-gray to-netflix-dark-gray flex items-center justify-center text-netflix-light-gray">
-                                                    <span className="text-center p-4 font-medium">{movie.title}</span>
-                                                </div>
-                                            )}
-
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                                <button
-                                                    onClick={() => playContent(movie.id, 'movie', movie.title)}
-                                                    className="bg-netflix-red text-white p-4 rounded-full hover:bg-red-600 transition-all duration-200 shadow-lg"
-                                                >
-                                                    ▶
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-4">
-                                            <h4 className="font-semibold text-white truncate text-lg group-hover:text-netflix-red transition-colors duration-200">
-                                                {movie.title}
-                                            </h4>
-                                            <div className="flex items-center space-x-2 text-sm text-netflix-light-gray mt-2">
-                                                <span>⭐ {movie.vote_average.toFixed(1)}</span>
-                                                <span>•</span>
-                                                <span>{new Date(movie.release_date).getFullYear()}</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <MovieCard
+                                        key={movie.id}
+                                        id={movie.id}
+                                        title={movie.title}
+                                        posterPath={movie.poster_path}
+                                        voteAverage={movie.vote_average}
+                                        releaseDate={movie.release_date}
+                                        mediaType="movie"
+                                        overview={movie.overview}
+                                        originalLanguage={movie.original_language}
+                                        onPlay={playContent}
+                                    />
                                 ))}
                             </div>
                         )}
@@ -391,46 +341,18 @@ export default function HomePage() {
                         ) : (
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
                                 {tvShows.map((show) => (
-                                    <div key={show.id} className="group cursor-pointer transform transition-all duration-300 hover:scale-105">
-                                        <div className="relative aspect-[2/3] bg-netflix-gray rounded-xl overflow-hidden shadow-lg">
-                                            {show.poster_path ? (
-                                                <img
-                                                    src={`${IMAGE_BASE_URL}${show.poster_path}`}
-                                                    alt={show.name}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                                    onError={(e) => {
-                                                        e.currentTarget.src = `https://via.placeholder.com/300x450/2F2F2F/808080?text=${encodeURIComponent(show.name)}`
-                                                    }}
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full bg-gradient-to-br from-netflix-gray to-netflix-dark-gray flex items-center justify-center text-netflix-light-gray">
-                                                    <span className="text-center p-4 font-medium">{show.name}</span>
-                                                </div>
-                                            )}
-
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                                <button
-                                                    onClick={() => playContent(show.id, 'tv', show.name)}
-                                                    className="bg-netflix-red text-white p-4 rounded-full hover:bg-red-600 transition-all duration-200 shadow-lg"
-                                                >
-                                                    ▶
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-4">
-                                            <h4 className="font-semibold text-white truncate text-lg group-hover:text-netflix-red transition-colors duration-200">
-                                                {show.name}
-                                            </h4>
-                                            <div className="flex items-center space-x-2 text-sm text-netflix-light-gray mt-2">
-                                                <span>⭐ {show.vote_average.toFixed(1)}</span>
-                                                <span>•</span>
-                                                <span>{new Date(show.first_air_date).getFullYear()}</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <MovieCard
+                                        key={show.id}
+                                        id={show.id}
+                                        title={show.name}
+                                        posterPath={show.poster_path}
+                                        voteAverage={show.vote_average}
+                                        releaseDate={show.first_air_date}
+                                        mediaType="tv"
+                                        overview={show.overview}
+                                        originalLanguage={show.original_language}
+                                        onPlay={playContent}
+                                    />
                                 ))}
                             </div>
                         )}

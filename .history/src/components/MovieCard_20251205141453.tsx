@@ -1,4 +1,5 @@
 import { Star, Calendar, Play } from 'lucide-react'
+import DownloadMenu from './DownloadMenu'
 
 interface MovieCardProps {
     id: number
@@ -7,6 +8,8 @@ interface MovieCardProps {
     voteAverage: number
     releaseDate: string
     mediaType: string
+    overview?: string
+    originalLanguage?: string
     onPlay: (id: number, type: string, title: string) => void
 }
 
@@ -19,6 +22,8 @@ export function MovieCard({
     voteAverage,
     releaseDate,
     mediaType,
+    overview,
+    originalLanguage,
     onPlay
 }: MovieCardProps) {
     return (

@@ -1,0 +1,13 @@
+*.log
+.DS_Store
+.env
+.env.local
+.env.production
+node_modules
+.next
+out
+dist
+.vercel
+.netlify
+.cache
+coverage

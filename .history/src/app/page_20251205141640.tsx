@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { X } from 'lucide-react'
+import { X, Bookmark } from 'lucide-react'
+import { MovieCard } from '@/components/MovieCard'
 
 // Types
 interface Movie {
@@ -147,7 +148,7 @@ export default function HomePage() {
                 <div className="max-w-7xl mx-auto px-6 py-4">
                     <div className="flex items-center justify-between">
                         <h1 className="text-3xl font-bold text-netflix-red">
-                            C
+                            CineStream
                         </h1>
 
                         <div className="flex items-center space-x-3 bg-netflix-gray rounded-xl px-6 py-3 max-w-2xl w-full mx-8">
@@ -251,50 +252,18 @@ export default function HomePage() {
                                     if (mediaType === 'person') return null
 
                                     return (
-                                        <div key={`${item.id}-${mediaType}`} className="group cursor-pointer transform transition-all duration-300 hover:scale-105">
-                                            <div className="relative aspect-[2/3] bg-netflix-gray rounded-xl overflow-hidden shadow-lg">
-                                                {item.poster_path ? (
-                                                    <img
-                                                        src={`${IMAGE_BASE_URL}${item.poster_path}`}
-                                                        alt={title}
-                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                                        onError={(e) => {
-                                                            e.currentTarget.src = `https://via.placeholder.com/300x450/2F2F2F/808080?text=${encodeURIComponent(title)}`
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gradient-to-br from-netflix-gray to-netflix-dark-gray flex items-center justify-center text-netflix-light-gray">
-                                                        <span className="text-center p-4 font-medium">{title}</span>
-                                                    </div>
-                                                )}
-
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                                    <button
-                                                        onClick={() => playContent(item.id, mediaType, title)}
-                                                        className="bg-netflix-red text-white p-4 rounded-full hover:bg-red-600 transition-all duration-200 shadow-lg"
-                                                    >
-                                                        ▶
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-4">
-                                                <h4 className="font-semibold text-white truncate text-lg group-hover:text-netflix-red transition-colors duration-200">
-                                                    {title}
-                                                </h4>
-                                                <div className="flex items-center space-x-2 text-sm text-netflix-light-gray mt-2">
-                                                    <span>⭐ {item.vote_average.toFixed(1)}</span>
-                                                    {releaseDate && (
-                                                        <>
-                                                            <span>•</span>
-                                                            <span>{new Date(releaseDate).getFullYear()}</span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <MovieCard
+                                            key={`${item.id}-${mediaType}`}
+                                            id={item.id}
+                                            title={title}
+                                            posterPath={item.poster_path}
+                                            voteAverage={item.vote_average}
+                                            releaseDate={releaseDate}
+                                            mediaType={mediaType}
+                                            overview={item.overview}
+                                            originalLanguage={item.original_language}
+                                            onPlay={playContent}
+                                        />
                                     )
                                 })}
                             </div>
